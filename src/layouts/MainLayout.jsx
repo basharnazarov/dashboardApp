@@ -1,82 +1,144 @@
-import React from "react";
-import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
+import * as React from "react";
+import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import MuiDrawer from "@mui/material/Drawer";
+import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
+import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
+import MuiAccordion from "@mui/material/Accordion";
+import MuiAccordionSummary from "@mui/material/AccordionSummary";
+import MuiAccordionDetails from "@mui/material/AccordionDetails";
+
+const Accordion = styled((props) => (
+  <MuiAccordion disableGutters elevation={0} square {...props} />
+))(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  "&:not(:last-child)": {
+    borderBottom: 0,
+  },
+  "&:before": {
+    display: "none",
+  },
+}));
+
+const AccordionSummary = styled((props) => (
+  <MuiAccordionSummary
+    expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: "0.9rem" }} />}
+    {...props}
+  />
+))(({ theme }) => ({
+  backgroundColor:
+    theme.palette.mode === "dark"
+      ? "rgba(255, 255, 255, .05)"
+      : "rgba(0, 0, 0, .03)",
+  flexDirection: "reverse",
+  "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": {
+    transform: "rotate(90deg)",
+  },
+  "& .MuiAccordionSummary-content": {
+    marginLeft: theme.spacing(1),
+  },
+}));
+
+const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderTop: "1px solid rgba(0, 0, 0, .125)",
+}));
 
 const drawerWidth = 240;
 
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
-  ({ theme, open }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: `-${drawerWidth}px`,
-    ...(open && {
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginLeft: 0,
-    }),
-  })
-);
+const openedMixin = (theme) => ({
+  width: drawerWidth,
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  overflowX: "hidden",
+});
+
+const closedMixin = (theme) => ({
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  overflowX: "hidden",
+  width: `calc(${theme.spacing(7)} + 1px)`,
+  [theme.breakpoints.up("sm")]: {
+    width: `calc(${theme.spacing(8)} + 1px)`,
+  },
+});
+
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+}));
+
+const IconSpace = styled('div')(() => ({
+  position:'relative',
+  left: '30px',
+  
+}))
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
-  transition: theme.transitions.create(["margin", "width"], {
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
+    marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: `${drawerWidth}px`,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
 }));
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  ...(open && {
+    ...openedMixin(theme),
+    "& .MuiDrawer-paper": openedMixin(theme),
+  }),
+  ...(!open && {
+    ...closedMixin(theme),
+    "& .MuiDrawer-paper": closedMixin(theme),
+  }),
 }));
 
-function MainLayout(props) {
+export default function MainLayout() {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(true);
-  const [expanded, setExpanded] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const [expanded, setExpanded] = React.useState("panel1");
 
-  const handleChange = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false);
+  const handleChange = (panel) => (event, newExpanded) => {
+    setExpanded(newExpanded ? panel : false);
   };
 
   const handleDrawerOpen = () => {
@@ -92,144 +154,124 @@ function MainLayout(props) {
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: "none" }) }}
-          >
-            <MenuIcon />
-          </IconButton>
           <Typography variant="h6" noWrap component="div">
             Dashboard
           </Typography>
         </Toolbar>
       </AppBar>
       <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-        variant="persistent"
-        anchor="left"
+        variant="permanent"
         open={open}
+        style={{ zIndex: "0", background: "grey" }}
       >
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
-          </IconButton>
+        <DrawerHeader
+          style={{ display: "flex", justifyContent: "center" }}
+          className="headerrr"
+        >
+          <Typography variant="h6" noWrap component="div">
+            Logo
+          </Typography>
         </DrawerHeader>
-        <Divider />
-        <Box sx={{ ml: 2, pt: 2, pb: 2 }}>Dashboard</Box>
-        <Divider />
         <div>
           <Accordion
             expanded={expanded === "panel1"}
-            onChange={handleChange("panel1")}
+            onChange={open ? handleChange("panel1") : null}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1bh-content"
-              id="panel1bh-header"
+              aria-controls="panel1d-content"
+              id="panel1d-header"
             >
-              <Typography sx={{ width: "100%", flexShrink: 0 }}>
-                General settings
-              </Typography>
+              <Typography>Users</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>
-                <ul>
-                  <li>one</li>
-                  <li>two</li>
-                  <li>three</li>
-                  <li>four</li>
-                </ul>
-              </Typography>
+              <Typography>Lorem ipsum</Typography>
             </AccordionDetails>
           </Accordion>
           <Accordion
             expanded={expanded === "panel2"}
-            onChange={handleChange("panel2")}
+            onChange={open ? handleChange("panel2") : null}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel2bh-content"
-              id="panel2bh-header"
+              aria-controls="panel2d-content"
+              id="panel2d-header"
             >
-              <Typography sx={{ width: "100%", flexShrink: 0 }}>
-                Users
-              </Typography>
+              {/* <IconSpace> */}
+              {/* <DashboardIcon /> */}
+              {/* </IconSpace> */}
+              <Typography >Orders</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>
-                <ul>
-                  <li>one</li>
-                  <li>two</li>
-                </ul>
-              </Typography>
+              <Typography>Lorem ipsum</Typography>
             </AccordionDetails>
           </Accordion>
           <Accordion
             expanded={expanded === "panel3"}
-            onChange={handleChange("panel3")}
+            onChange={open ? handleChange("panel3") : null}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel3bh-content"
-              id="panel3bh-header"
+              aria-controls="panel3d-content"
+              id="panel3d-header"
             >
-              <Typography sx={{ width: "100%", flexShrink: 0 }}>
-                Advanced settings
-              </Typography>
+              <Typography>Features</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>
-                {" "}
-                <ul>
-                  <li>one</li>
-                  <li>two</li>
-                </ul>
-              </Typography>
-            </AccordionDetails>
-          </Accordion>
-          <Accordion
-            expanded={expanded === "panel4"}
-            onChange={handleChange("panel4")}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel4bh-content"
-              id="panel4bh-header"
-            >
-              <Typography sx={{ width: "100%", flexShrink: 0 }}>
-                Personal data
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography>
-                <ul>
-                  <li>one</li>
-                  <li>two</li>
-                </ul>
-              </Typography>
+              <Typography>Lorem ipsum</Typography>
             </AccordionDetails>
           </Accordion>
         </div>
+        {/* 
+        <Divider />
+
+        <List>
+          {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
+            <ListItem key={text} disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                </ListItemIcon>
+                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List> */}
       </Drawer>
-      <Main open={open}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <IconButton
+          style={{
+            position: "relative",
+            left: "-2.4vw",
+            top: "50vh",
+            zIndex: "3",
+            borderRadius: "50px",
+            background: "#ddd",
+          }}
+        >
+          {!open ? (
+            <KeyboardDoubleArrowRightIcon
+              fontSize="medium"
+              onClick={handleDrawerOpen}
+            />
+          ) : (
+            <KeyboardDoubleArrowLeftIcon
+              fontSize="medium"
+              onClick={handleDrawerClose}
+            />
+          )}
+        </IconButton>
         <DrawerHeader />
-        {props.children}
-      </Main>
+      </Box>
     </Box>
   );
 }
-export default MainLayout;
