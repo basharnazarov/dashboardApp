@@ -4,17 +4,12 @@ import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
+import Avatar from "@mui/material/Avatar";
+import Stack from "@mui/material/Stack";
 import CssBaseline from "@mui/material/CssBaseline";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -22,6 +17,11 @@ import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import MuiAccordion from "@mui/material/Accordion";
 import MuiAccordionSummary from "@mui/material/AccordionSummary";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -78,7 +78,7 @@ const closedMixin = (theme) => ({
   overflowX: "hidden",
   width: `calc(${theme.spacing(7)} + 1px)`,
   [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
+    width: `calc(${theme.spacing(7)} + 1px)`,
   },
 });
 
@@ -90,12 +90,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
-
-const IconSpace = styled('div')(() => ({
-  position:'relative',
-  left: '30px',
-  
-}))
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -112,6 +106,9 @@ const AppBar = styled(MuiAppBar, {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
+  }),
+  ...(!open && {
+    width: `calc(100% - ${56}px)`,
   }),
 }));
 
@@ -132,10 +129,18 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-export default function MainLayout() {
+export default function MainLayout(props) {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
-  const [expanded, setExpanded] = React.useState("panel1");
+  const [open, setOpen] = React.useState(true);
+  const [expanded, setExpanded] = React.useState("");
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const openMenu = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleChange = (panel) => (event, newExpanded) => {
     setExpanded(newExpanded ? panel : false);
@@ -152,53 +157,126 @@ export default function MainLayout() {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
-        <Toolbar>
+      <AppBar position="fixed" open={open} color="transparent" elevation={0}>
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Typography variant="h6" noWrap component="div">
             Dashboard
           </Typography>
+          <Stack direction="row" spacing={1}>
+            <div>
+              <Button
+                id="basic-button"
+                aria-controls={openMenu ? "basic-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={openMenu ? "true" : undefined}
+                onClick={handleClick}
+                color='inherit'
+              >
+                Options
+                <KeyboardArrowDownIcon />
+              </Button>
+              <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={openMenu}
+                onClose={handleClose}
+                MenuListProps={{
+                  "aria-labelledby": "basic-button",
+                }}
+              >
+                {/* <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <MenuItem onClick={handleClose}>My account</MenuItem> */}
+                <MenuItem onClick={handleClose}>Logout</MenuItem>
+              </Menu>
+            </div>
+            <Avatar>
+              <AccountCircleIcon />
+            </Avatar>
+          </Stack>
         </Toolbar>
+
+        <Divider />
       </AppBar>
-      <Drawer
-        variant="permanent"
-        open={open}
-        style={{ zIndex: "0", background: "grey" }}
-      >
+
+      <Drawer variant="permanent" open={open} style={{ zIndex: "0" }}>
         <DrawerHeader
-          style={{ display: "flex", justifyContent: "center" }}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            background: "rgba(0, 0, 0, .03)",
+            
+          }}
           className="headerrr"
         >
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="text" noWrap component="div" sx={{background:'white', width: '40px', height: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
             Logo
           </Typography>
         </DrawerHeader>
         <div>
+          <Divider />
+          <Box
+            sx={{
+              width: "240px",
+              height: "48px",
+              background: "rgba(0, 0, 0, .03)",
+              padding: "0 16px 0 10px",
+              display: "flex",
+              alignItems: "center",
+              "&:hover": {
+                cursor: "pointer",
+                background: "grey",
+              },
+            }}
+          >
+            <DashboardIcon sx={{ mr: 2, ml: 1 }} />
+            <Typography>Dashboard</Typography>
+          </Box>
           <Accordion
             expanded={expanded === "panel1"}
             onChange={open ? handleChange("panel1") : null}
+            sx={{
+              "& .css-1l0yxov-MuiButtonBase-root-MuiAccordionSummary-root": {
+                padding: "0 16px 0 0",
+                width: "240px",
+                "&:hover": {
+                  background: "grey",
+                },
+              },
+            }}
           >
             <AccordionSummary
               aria-controls="panel1d-content"
               id="panel1d-header"
             >
+              <DashboardIcon sx={{ mr: 2, ml: 1 }} />
+
               <Typography>Users</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Typography>Lorem ipsum</Typography>
             </AccordionDetails>
           </Accordion>
+
           <Accordion
             expanded={expanded === "panel2"}
             onChange={open ? handleChange("panel2") : null}
+            sx={{
+              "& .css-1l0yxov-MuiButtonBase-root-MuiAccordionSummary-root": {
+                padding: "0 16px 0 0",
+                width: "240px",
+                "&:hover": {
+                  background: "grey",
+                },
+              },
+            }}
           >
             <AccordionSummary
               aria-controls="panel2d-content"
               id="panel2d-header"
             >
-              {/* <IconSpace> */}
-              {/* <DashboardIcon /> */}
-              {/* </IconSpace> */}
-              <Typography >Orders</Typography>
+              <DashboardIcon sx={{ mr: 2, ml: 1 }} />
+
+              <Typography>Users</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Typography>Lorem ipsum</Typography>
@@ -207,45 +285,129 @@ export default function MainLayout() {
           <Accordion
             expanded={expanded === "panel3"}
             onChange={open ? handleChange("panel3") : null}
+            sx={{
+              "& .css-1l0yxov-MuiButtonBase-root-MuiAccordionSummary-root": {
+                padding: "0 16px 0 0",
+                width: "240px",
+                "&:hover": {
+                  background: "grey",
+                },
+              },
+            }}
           >
             <AccordionSummary
               aria-controls="panel3d-content"
               id="panel3d-header"
             >
-              <Typography>Features</Typography>
+              <DashboardIcon sx={{ mr: 2, ml: 1 }} />
+
+              <Typography>Users</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography>Lorem ipsum</Typography>
+            </AccordionDetails>
+          </Accordion>
+          <Accordion
+            expanded={expanded === "panel4"}
+            onChange={open ? handleChange("panel4") : null}
+            sx={{
+              "& .css-1l0yxov-MuiButtonBase-root-MuiAccordionSummary-root": {
+                padding: "0 16px 0 0",
+                width: "240px",
+                "&:hover": {
+                  background: "grey",
+                },
+              },
+            }}
+          >
+            <AccordionSummary
+              aria-controls="panel4d-content"
+              id="panel4d-header"
+            >
+              <DashboardIcon sx={{ mr: 2, ml: 1 }} />
+
+              <Typography>Users</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography>Lorem ipsum</Typography>
+            </AccordionDetails>
+          </Accordion>
+          <Accordion
+            expanded={expanded === "panel5"}
+            onChange={open ? handleChange("panel5") : null}
+            sx={{
+              "& .css-1l0yxov-MuiButtonBase-root-MuiAccordionSummary-root": {
+                padding: "0 16px 0 0",
+                width: "240px",
+                "&:hover": {
+                  background: "grey",
+                },
+              },
+            }}
+          >
+            <AccordionSummary
+              aria-controls="panel5d-content"
+              id="panel5d-header"
+            >
+              <DashboardIcon sx={{ mr: 2, ml: 1 }} />
+
+              <Typography>Users</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography>Lorem ipsum</Typography>
+            </AccordionDetails>
+          </Accordion>
+          <Accordion
+            expanded={expanded === "panel6"}
+            onChange={open ? handleChange("panel6") : null}
+            sx={{
+              "& .css-1l0yxov-MuiButtonBase-root-MuiAccordionSummary-root": {
+                padding: "0 16px 0 0",
+                width: "240px",
+                "&:hover": {
+                  background: "grey",
+                },
+              },
+            }}
+          >
+            <AccordionSummary
+              aria-controls="panel6d-content"
+              id="panel6d-header"
+            >
+              <DashboardIcon sx={{ mr: 2, ml: 1 }} />
+
+              <Typography>Users</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography>Lorem ipsum</Typography>
+            </AccordionDetails>
+          </Accordion>
+          <Accordion
+            expanded={expanded === "panel7"}
+            onChange={open ? handleChange("panel7") : null}
+            sx={{
+              "& .css-1l0yxov-MuiButtonBase-root-MuiAccordionSummary-root": {
+                padding: "0 16px 0 0",
+                width: "240px",
+                "&:hover": {
+                  background: "grey",
+                },
+              },
+            }}
+          >
+            <AccordionSummary
+              aria-controls="panel7d-content"
+              id="panel7d-header"
+            >
+              <DashboardIcon sx={{ mr: 2, ml: 1 }} />
+
+              <Typography>Users</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Typography>Lorem ipsum</Typography>
             </AccordionDetails>
           </Accordion>
         </div>
-        {/* 
-        <Divider />
-
-        <List>
-          {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                  }}
-                >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List> */}
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <IconButton
@@ -271,6 +433,7 @@ export default function MainLayout() {
           )}
         </IconButton>
         <DrawerHeader />
+        {props.children}
       </Box>
     </Box>
   );
